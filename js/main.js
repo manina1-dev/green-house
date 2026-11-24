@@ -58,12 +58,14 @@
   $("#langToggle").addEventListener("click", () => setLang(lang === "en" ? "el" : "en"));
 
   // ---------- photos ----------
+  // data-photo="garden-01" → the photo images/garden-01.jpg (caption from config when listed there)
+  const byName = n => photos.find(p => p.src.endsWith("/" + n + ".jpg")) || { src: "images/" + n + ".jpg", el: "" };
   $$("[data-photo]").forEach(img => {
-    const p = photos[+img.dataset.photo]; if (!p) return;
+    const p = byName(img.dataset.photo);
     img.src = sized(p.src, 1200); img.alt = p.el;
   });
   $$("[data-photo-bg]").forEach(el => {
-    const p = photos[+el.dataset.photoBg]; if (p) el.style.backgroundImage = `url('${sized(p.src, 1920)}')`;
+    el.style.backgroundImage = `url('${sized(byName(el.dataset.photoBg).src, 1920)}')`;
   });
 
   function buildGallery() {
