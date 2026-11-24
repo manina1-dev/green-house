@@ -39,6 +39,10 @@
     "contact.eyebrow": "Book & contact", "contact.title": "Come and stay at Green House",
     "contact.lead": "To book or ask anything, contact us directly. If you prefer, you can also book through Airbnb.",
     "footer.ama": "Property Reg. No.",
+    "nav.availability": "Availability",
+    "cal.eyebrow": "Availability", "cal.title": "When the house is free",
+    "cal.lead": "This calendar updates automatically. Found free dates? Send us a message and we'll book them for you, or book on Airbnb.",
+    "cal.free": "Available", "cal.booked": "Booked", "cal.book": "Ask about your dates",
   };
 
   // ---------- language ----------
@@ -54,6 +58,7 @@
     $("#langToggle").textContent = l === "en" ? "EL" : "EN";
     try { localStorage.setItem("gh-lang", l); } catch (e) {}
     buildGallery();
+    renderCalendar();
   }
   $("#langToggle").addEventListener("click", () => setLang(lang === "en" ? "el" : "en"));
 
@@ -101,6 +106,61 @@
   link(".contact-whatsapp", H.whatsapp && "https://wa.me/" + H.whatsapp);
   link(".contact-email", H.email && "mailto:" + H.email);
   link(".contact-phone", H.phone && "tel:" + H.phone.replace(/\s/g, ""));
+
+  // ---------- availability calendar (data/availability.json, synced from Airbnb) ----------
+  const calMonths = $("#calMonths"), calPrev = $("#calPrev"), calNext = $("#calNext"), calUpdated = $("#calUpdated");
+  const MAX_AHEAD = 12; // months shown ahead
+  let booked = [], updatedAt = null, offset = 0;
+  const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const isBooked = k => booked.some(([s, e]) => k >= s && k < e); // nights: the check-out day stays free
+  const perView = () => (matchMedia("(max-width: 900px)").matches ? 1 : 2);
+  function renderCalendar() {
+    if (!calMonths) return;
+    const loc = lang === "en" ? "en-GB" : "el-GR";
+    const now = new Date(), todayKey = iso(now), n = perView();
+    offset = Math.max(0, Math.min(offset, MAX_AHEAD - n));
+    calPrev.disabled = offset === 0; calNext.disabled = offset >= MAX_AHEAD - n;
+    const dows = [];
+    for (let i = 0; i < 7; i++) dows.push(new Date(2024, 0, 1 + i).toLocaleDateString(loc, { weekday: "short" })); // Mon..Sun
+    calMonths.innerHTML = "";
+    for (let m = 0; m < n; m++) {
+      const first = new Date(now.getFullYear(), now.getMonth() + offset + m, 1);
+      const box = document.createElement("div"); box.className = "cal-month";
+      const h = document.createElement("h3");
+      h.textContent = first.toLocaleDateString(loc, { month: "long", year: "numeric" });
+      const grid = document.createElement("div"); grid.className = "cal-grid";
+      dows.forEach(w => { const c = document.createElement("div"); c.className = "dow"; c.textContent = w.replace(".", ""); grid.appendChild(c); });
+      for (let i = 0; i < (first.getDay() + 6) % 7; i++) grid.appendChild(document.createElement("div"));
+      const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+      for (let d = 1; d <= days; d++) {
+        const k = iso(new Date(first.getFullYear(), first.getMonth(), d));
+        const c = document.createElement("div"); c.className = "d"; c.textContent = d;
+        if (k < todayKey) c.classList.add("past");
+        else if (isBooked(k)) { c.classList.add("booked"); c.title = lang === "en" ? "Booked" : "Κλεισμένο"; }
+        if (k === todayKey) c.classList.add("today");
+        grid.appendChild(c);
+      }
+      box.append(h, grid); calMonths.appendChild(box);
+    }
+    calUpdated.textContent = updatedAt
+      ? (lang === "en" ? "Last updated: " : "Τελευταία ενημέρωση: ") +
+        updatedAt.toLocaleString(loc, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })
+      : "";
+  }
+  if (calMonths) {
+    calPrev.addEventListener("click", () => { offset -= perView(); renderCalendar(); });
+    calNext.addEventListener("click", () => { offset += perView(); renderCalendar(); });
+    matchMedia("(max-width: 900px)").addEventListener("change", renderCalendar);
+    fetch("data/availability.json?t=" + Date.now(), { cache: "no-store" })
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (!j) return;
+        booked = Array.isArray(j.booked) ? j.booked : [];
+        updatedAt = j.updated ? new Date(j.updated) : null;
+        renderCalendar();
+      })
+      .catch(() => {});
+  }
 
   // ---------- menu ----------
   const menu = $("#menu");
