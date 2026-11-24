@@ -38,6 +38,7 @@
     "rules.4": "No smoking (including e-cigarettes)", "rules.5": "No parties or events", "rules.6": "Exterior security camera on the property",
     "contact.eyebrow": "Book & contact", "contact.title": "Come and stay at Green House",
     "contact.lead": "To book or ask anything, contact us directly. If you prefer, you can also book through Airbnb.",
+    "footer.ama": "Property Reg. No.",
   };
 
   // ---------- language ----------
@@ -116,6 +117,7 @@
     $$(".reveal").forEach(el => io.observe(el));
   } else $$(".reveal").forEach(el => el.classList.add("in"));
 
+  if (H.ama) $(".ama-num").textContent = H.ama; else $(".ama-wrap").remove();
   $("#year").textContent = new Date().getFullYear();
   setLang(lang);
 })();
