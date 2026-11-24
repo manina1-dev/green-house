@@ -98,6 +98,32 @@ section{padding:110px 0}
 .gallery img{transition:transform .6s}
 .gallery button:hover img{transform:scale(1.05)}
 
+/* availability calendar */
+.btn-outline{border-color:var(--green);color:var(--green)}
+.btn-outline:hover{background:var(--green);color:#fff}
+.cal-lead{max-width:640px;color:var(--muted)}
+.cal{position:relative;background:var(--cream);border-radius:4px;padding:36px 40px 26px;margin-top:40px}
+.cal-nav{position:absolute;top:30px;left:30px;right:30px;display:flex;justify-content:space-between;pointer-events:none}
+.cal-btn{pointer-events:auto;background:none;border:0;font-size:1.3rem;color:var(--ink);cursor:pointer;padding:4px 10px}
+.cal-btn:disabled{opacity:.2;cursor:default}
+.cal-months{display:grid;grid-template-columns:1fr 1fr;gap:60px}
+.cal-month h3{text-align:center;font-size:1.5rem;margin:0 0 22px;text-transform:capitalize}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-grid .dow{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-bottom:10px}
+.cal-grid .d{aspect-ratio:1;display:grid;place-items:center;font-size:.9rem;font-weight:400}
+.cal-grid .d.booked{color:#9aa59c;text-decoration:line-through;background:rgba(63,90,69,.12)}
+.cal-grid .d.past{color:#c4c9c2}
+.cal-grid .d.today{outline:1px solid var(--green);outline-offset:-4px}
+.cal-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.cal-legend{display:flex;gap:26px;font-size:.8rem}
+.cal-legend>span{display:inline-flex;align-items:center;gap:8px}
+.lg{width:14px;height:14px;display:inline-block}
+.lg-free{border:1px solid var(--line);background:var(--paper)}
+.lg-booked{background:rgba(63,90,69,.22)}
+.cal-actions{display:flex;gap:12px;flex-wrap:wrap}
+.cal-updated{margin:14px 0 0;font-size:.75rem;color:var(--muted)}
+.cal-updated:empty{display:none}
+
 /* location */
 .loc-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:60px;align-items:center}
 .loc-grid p{color:var(--muted)}
@@ -149,5 +175,8 @@ section{padding:110px 0}
   .duo{grid-template-columns:1fr}
   .duo .offset{margin-top:0;aspect-ratio:4/3}
   .gallery{grid-template-columns:1fr 1fr;grid-auto-rows:160px}
+  .cal-months{grid-template-columns:1fr}
+  .cal{padding:28px 14px 20px}
+  .cal-nav{top:22px;left:6px;right:6px}
 }
 @media (max-width:520px){.am-grid{grid-template-columns:1fr}}
